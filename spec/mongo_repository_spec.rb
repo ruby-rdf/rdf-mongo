@@ -15,7 +15,9 @@ describe RDF::Mongo::Repository do
   end
 
   # @see lib/rdf/spec/repository.rb in RDF-spec
-  include RDF_Repository
+  it_behaves_like "an RDF::Repository" do
+    let(:repository) {@repository}
+  end
 
   context "problemantic examples" do
     subject {@repository}

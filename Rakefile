@@ -34,5 +34,5 @@ namespace :doc do
   end
 end
 
-task :default => :spec
-task :specs => :spec
+task default: :spec
+task specs: :spec
