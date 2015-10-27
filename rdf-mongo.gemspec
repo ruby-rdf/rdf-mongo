@@ -1,5 +1,12 @@
 #!/usr/bin/env ruby -rubygems
 # -*- encoding: utf-8 -*-
+
+begin
+  RUBY_ENGINE
+rescue NameError
+  RUBY_ENGINE = "ruby"  # Not defined in Ruby 1.8.7
+end
+
 Gem::Specification.new do |gem|
   gem.version            = File.read('VERSION').chomp
   gem.date               = File.mtime('VERSION').strftime('%Y-%m-%d')
@@ -25,7 +32,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency     'rdf',             '~> 1.99'
   gem.add_runtime_dependency     'mongo',           '~> 1.10'
 
-  gem.add_development_dependency 'rdf-spec',        '~> 1.1'
+  gem.add_development_dependency 'rdf-spec',        '~> 1.99'
   gem.add_development_dependency 'rspec',           '~> 3.0'
   gem.add_development_dependency 'rspec-its',       '~> 1.0'
   gem.add_development_dependency 'yard' ,           '~> 0.8'
