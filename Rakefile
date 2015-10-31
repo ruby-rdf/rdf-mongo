@@ -5,7 +5,7 @@ require 'rspec/core/rake_task'
 namespace :gem do
   desc "Build the rdf-mongo-#{File.read('VERSION').chomp}.gem file"
   task :build do
-    sh "gem build .gemspec && mv rdf-mongo-#{File.read('VERSION').chomp}.gem pkg/"
+    sh "gem build rdf-mongo.gemspec && mv rdf-mongo-#{File.read('VERSION').chomp}.gem pkg/"
   end
 
   desc "Release the rdf-mongo-#{File.read('VERSION').chomp}.gem file"
@@ -34,5 +34,5 @@ namespace :doc do
   end
 end
 
-task :default => :spec
-task :specs => :spec
+task default: :spec
+task specs: :spec
