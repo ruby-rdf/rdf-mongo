@@ -155,6 +155,7 @@ module RDF
       end
       
       def insert_statement(statement)
+        raise ArgumentError, "Statement #{statement.inspect} is incomplete" if statement.incomplete?
         st_mongo = statement.to_mongo
         st_mongo[:ct] ||= :default # Indicate statement is in the default graph
         #puts "insert statement: #{st_mongo.inspect}"
