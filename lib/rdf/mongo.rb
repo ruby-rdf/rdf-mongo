@@ -219,7 +219,7 @@ module RDF
       # @private
       # @see RDF::Enumerable#has_graph?
       def has_graph?(value)
-        !!@coll.find_one(RDF::Mongo::Conversion.to_mongo(value, :context))
+        !!@coll.find_one(RDF::Mongo::Conversion.to_mongo(value, :graph_name))
       end
 
       protected
@@ -228,7 +228,8 @@ module RDF
       # @private
       # @see RDF::Queryable#query_pattern
       # @see RDF::Query::Pattern
-      def query_pattern(pattern, &block)
+      def query_pattern(pattern, options = {}, &block)
+        return enum_for(:query_pattern, pattern, options) unless block_given?
         @nodes = {} # reset cache. FIXME this should probably be in Node.intern
 
         # A pattern graph_name of `false` is used to indicate the default graph
