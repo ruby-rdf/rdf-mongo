@@ -14,4 +14,4 @@ services:
 cache: bundler
 matrix:
   allow_failures:
-    - rvm: 2.1.8
+    - rvm: rbx-2
