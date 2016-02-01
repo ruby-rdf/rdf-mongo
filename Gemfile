@@ -4,6 +4,7 @@ gemspec
 
 gem "rdf",            git: "git://github.com/ruby-rdf/rdf.git", branch: "develop"
 gem "rdf-spec",       git: "git://github.com/ruby-rdf/rdf-spec.git", branch: "develop"
+gem 'rdf-isomorphic', git: "git://github.com/ruby-rdf/rdf-isomorphic.git", branch: "develop"
 
 group :debug do
   gem "byebug", platforms: :mri
