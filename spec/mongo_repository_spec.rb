@@ -6,7 +6,8 @@ require 'rdf/mongo'
 
 describe RDF::Mongo::Repository do
   before :each do
-    @repository = RDF::Mongo::Repository.new() # TODO: Do you need constructor arguments?
+    @load_durable = lambda {RDF::Mongo::Repository.new uri: "mongodb://localhost:27017/quadb/quads"}
+    @repository = @load_durable.call
     @repository.coll.drop
   end
  

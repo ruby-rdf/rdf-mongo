@@ -122,16 +122,29 @@ module RDF
       #
       # @param  [Hash{Symbol => Object}] options
       # @option options [URI, #to_s]    :uri (nil)
+      #   URI in the form mongodb://host:port/db/collection
       # @option options [String, #to_s] :title (nil)
       # @option options [String] :host
       # @option options [Integer] :port
-      # @option options [String] :db
+      # @option options [String] :db ('quadb')
       # @option options [String] :user for authentication
       # @option options [String] :password for authentication
       # @option options [String] :collection ('quads')
       # @yield  [repository]
       # @yieldparam [Repository] repository
       def initialize(options = {}, &block)
+        if options[:uri]
+          options = options.dup
+          uri = RDF::URI(options[:uri])
+          options[:host] ||= uri.host
+          options[:port] ||= uri.port
+          _, db, collection = uri.path.split('/')
+          options[:db] ||= db
+          options[:collection] ||= collection
+        else
+          warn "[DEPRECATION] RDF::Mongo::Repository#initialize expects a uri argument. Called from #{Gem.location_of_caller.join(':')}" unless options.empty?
+        end
+
         options = {host: 'localhost', port: 27017, db: 'quadb', collection: 'quads'}.merge(options)
         @db = ::Mongo::Connection.new(options[:host], options[:port]).db(options[:db])
         @db.authenticate(options[:user], options[:password]) if options[:user] && options[:password]
@@ -150,6 +163,7 @@ module RDF
       def supports?(feature)
         case feature.to_sym
           when :graph_name then true
+          when :validity     then @options.fetch(:with_validity, true)
           else false
         end
       end
