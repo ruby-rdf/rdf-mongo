@@ -80,7 +80,7 @@ module RDF
           t, k1, lt = :ct, :c, :cl
         end
         h = {k1 => v, t => k, lt => ll}
-        h.delete_if {|k,v| h[k].nil?}
+        h.delete_if {|kk,_| h[kk].nil?}
       end
 
       ##
@@ -108,54 +108,63 @@ module RDF
 
     class Repository < ::RDF::Repository
       # The Mongo database instance
-      # @!attribute [r] db
       # @return [Mongo::DB]
-      attr_reader :db
+      attr_reader :client
 
       # The collection used for storing quads
-      # @!attribute [r] coll
       # @return [Mongo::Collection]
-      attr_reader :coll
+      attr_reader :collection
       
       ##
       # Initializes this repository instance.
       #
-      # @param  [Hash{Symbol => Object}] options
-      # @option options [URI, #to_s]    :uri (nil)
-      #   URI in the form mongodb://host:port/db/collection
-      # @option options [String, #to_s] :title (nil)
-      # @option options [String] :host
-      # @option options [Integer] :port
-      # @option options [String] :db ('quadb')
-      # @option options [String] :user for authentication
-      # @option options [String] :password for authentication
-      # @option options [String] :collection ('quads')
+      # @overload initialize(options = {}, &block)
+      #   @param  [Hash{Symbol => Object}] options
+      #   @option options [String, #to_s] :title (nil)
+      #   @option options [URI, #to_s]    :uri (nil)
+      #     URI in the form `mongodb://host:port/db`. The URI should also identify the collection use, but appending a `collection` path component such as `mongodb://host:port/db/collection`, this ensures that the collection will be maintained if cloned. See [Mongo::Client options](https://docs.mongodb.org/ecosystem/tutorial/ruby-driver-tutorial-2-0/#uri-options-conversions) for more information on Mongo URIs.
+      #
+      # @overload initialize(options = {}, &block)
+      #   @param  [Hash{Symbol => Object}] options
+      #     See [Mongo::Client options](https://docs.mongodb.org/ecosystem/tutorial/ruby-driver-tutorial-2-0/#uri-options-conversions) for more information on Mongo Client options.
+      #   @option options [String, #to_s] :title (nil)
+      #   @option options [String] :host
+      #     a single address or an array of addresses, which may contain a port designation
+      #   @option options [Integer] :port (27017) applied to host address(es)
+      #   @option options [String] :database ('quadb')
+      #   @option options [String] :collection ('quads')
+      #
       # @yield  [repository]
       # @yieldparam [Repository] repository
       def initialize(options = {}, &block)
+        collection = nil
         if options[:uri]
           options = options.dup
-          uri = RDF::URI(options[:uri])
-          options[:host] ||= uri.host
-          options[:port] ||= uri.port
-          _, db, collection = uri.path.split('/')
-          options[:db] ||= db
-          options[:collection] ||= collection
+          uri = RDF::URI(options.delete(:uri))
+          _, db, coll = uri.path.split('/')
+          collection = coll || options.delete(:collection)
+          db ||= "quadb"
+          uri.path = "/#{db}" if coll
+          @client = ::Mongo::Client.new(uri.to_s, options)
         else
           warn "[DEPRECATION] RDF::Mongo::Repository#initialize expects a uri argument. Called from #{Gem.location_of_caller.join(':')}" unless options.empty?
+          options[:database] ||= options.delete(:db) # 1.x compat
+          options[:database] ||= 'quadb'
+          hosts = Array(options[:host] || 'localhost')
+          hosts.map! {|h| "#{h}:#{options[:port]}"} if options[:port]
+          @client = ::Mongo::Client.new(hosts, options)
         end
 
-        options = {host: 'localhost', port: 27017, db: 'quadb', collection: 'quads'}.merge(options)
-        @db = ::Mongo::Connection.new(options[:host], options[:port]).db(options[:db])
-        @db.authenticate(options[:user], options[:password]) if options[:user] && options[:password]
-        @coll = @db[options[:collection]]
-        @coll.create_index("s")
-        @coll.create_index("p")
-        @coll.create_index("o")
-        @coll.create_index("c")
-        @coll.create_index([["s", ::Mongo::ASCENDING], ["p", ::Mongo::ASCENDING]])
-        @coll.create_index([["s", ::Mongo::ASCENDING], ["o", ::Mongo::ASCENDING]])
-        @coll.create_index([["p", ::Mongo::ASCENDING], ["o", ::Mongo::ASCENDING]])
+        @collection = @client[options.delete(:collection) || 'quads']
+        @collection.indexes.create_many([
+          {key: {s: 1}},
+          {key: {p: 1}},
+          {key: {o: "hashed"}},
+          {key: {c: 1}},
+          {key: {s: 1, p: 1}},
+          #{key: {s: 1, o: "hashed"}}, # Muti-key hashed indexes not allowed
+          #{key: {p: 1, o: "hashed"}}, # Muti-key hashed indexes not allowed
+        ])
         super(options, &block)
       end
 
@@ -173,16 +182,16 @@ module RDF
         st_mongo = statement.to_mongo
         st_mongo[:ct] ||= :default # Indicate statement is in the default graph
         #puts "insert statement: #{st_mongo.inspect}"
-        @coll.update(st_mongo, st_mongo, upsert: true)
+        @collection.update_one(st_mongo, st_mongo, upsert: true)
       end
 
       # @see RDF::Mutable#delete_statement
       def delete_statement(statement)
         case statement.graph_name
         when nil
-          @coll.remove(statement.to_mongo.merge('ct'=>:default))
+          @collection.delete_one(statement.to_mongo.merge('ct'=>:default))
         else
-          @coll.remove(statement.to_mongo)
+          @collection.delete_one(statement.to_mongo)
         end
       end
 
@@ -194,24 +203,24 @@ module RDF
       ##
       # @private
       # @see RDF::Countable#empty?
-      def empty?; @coll.count == 0; end
+      def empty?; @collection.count == 0; end
 
       ##
       # @private
       # @see RDF::Countable#count
       def count
-        @coll.count
+        @collection.count
       end
 
       def clear_statements
-        @coll.remove
+        @collection.delete_many
       end
 
       ##
       # @private
       # @see RDF::Enumerable#has_statement?
       def has_statement?(statement)
-        !!@coll.find_one(statement.to_mongo)
+        @collection.find(statement.to_mongo).count > 0
       end
       ##
       # @private
@@ -219,10 +228,8 @@ module RDF
       def each_statement(&block)
         @nodes = {} # reset cache. FIXME this should probably be in Node.intern
         if block_given?
-          @coll.find() do |cursor|
-            cursor.each do |data|
-              block.call(RDF::Statement.from_mongo(data))
-            end
+          @collection.find().each do |document|
+            block.call(RDF::Statement.from_mongo(document))
           end
         end
         enum_statement
@@ -233,7 +240,7 @@ module RDF
       # @private
       # @see RDF::Enumerable#has_graph?
       def has_graph?(value)
-        !!@coll.find_one(RDF::Mongo::Conversion.to_mongo(value, :graph_name))
+        @collection.find(RDF::Mongo::Conversion.to_mongo(value, :graph_name)).count > 0
       end
 
       protected
@@ -250,10 +257,8 @@ module RDF
         pm = pattern.to_mongo
         pm.merge!(c: nil, ct: :default) if pattern.graph_name == false
         #puts "query using #{pm.inspect}"
-        @coll.find(pm) do |cursor|
-          cursor.each do |data|
-            block.call(RDF::Statement.from_mongo(data))
-          end
+        @collection.find(pm).each do |document|
+          block.call(RDF::Statement.from_mongo(document))
         end
       end
     
