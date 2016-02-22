@@ -6,12 +6,15 @@ require 'rdf/mongo'
 
 describe RDF::Mongo::Repository do
   before :each do
-    @repository = RDF::Mongo::Repository.new() # TODO: Do you need constructor arguments?
-    @repository.coll.drop
+    @logger = RDF::Spec.logger
+    @load_durable = lambda {RDF::Mongo::Repository.new uri: "mongodb://localhost:27017/rdf-mongo/specs", logger: @logger}
+    @repository = @load_durable.call
+    @repository.collection.drop
   end
  
-  after :each do
-    @repository.coll.drop
+  after :each do |example|
+    #puts @logger.to_s if example.exception
+    @repository.collection.drop
   end
 
   # @see lib/rdf/spec/repository.rb in RDF-spec
