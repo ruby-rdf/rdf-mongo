@@ -13,12 +13,12 @@ Gem::Specification.new do |gem|
 
   gem.name               = 'rdf-mongo'
   gem.homepage           = 'http://ruby-rdf.github.com/rdf-mongo'
-  gem.license            = 'MIT License' if gem.respond_to?(:license=)
+  gem.license            = 'MIT' if gem.respond_to?(:license=)
   gem.summary            = 'A storage adapter for integrating MongoDB and rdf.rb, a Ruby library for working with Resource Description Framework (RDF) data.'
   gem.description        = 'rdf-mongo is a storage adapter for integrating MongoDB and rdf.rb, a Ruby library for working with Resource Description Framework (RDF) data.'
 
-  gem.authors            = ['Pius Uzamere']
-  gem.email              = 'pius@alum.mit.edu'
+  gem.authors            = ['Pius Uzamere', 'Gregg Kellogg']
+  gem.email              = ['pius@alum.mit.edu', 'gregg@greggkellogg.net']
 
   gem.platform           = Gem::Platform::RUBY
   gem.files              = %w(LICENSE VERSION README.md) + Dir.glob('lib/**/*.rb')
@@ -33,10 +33,10 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency     'mongo',           '~> 2.2'
 
   gem.add_development_dependency 'rdf-spec',        '>= 2.0.0.beta', '< 3'
-  gem.add_development_dependency 'rspec',           '~> 3.0'
-  gem.add_development_dependency 'rspec-its',       '~> 1.0'
-  gem.add_development_dependency 'yard' ,           '~> 0.8'
-  gem.add_development_dependency 'bson_ext' unless  defined?(:RUBY_ENGINE) && RUBY_ENGINE == "jruby"
+  gem.add_development_dependency 'rspec',           '~> 3.4'
+  gem.add_development_dependency 'rspec-its',       '~> 1.2'
+  gem.add_development_dependency 'yard',            '~> 0.8'
+  gem.add_development_dependency 'bson_ext',        '~> 1.12' unless  defined?(:RUBY_ENGINE) && RUBY_ENGINE == "jruby"
 
   # Rubinius has it's own dependencies
   if RUBY_ENGINE == "rbx" && RUBY_VERSION >= "2.1.0"

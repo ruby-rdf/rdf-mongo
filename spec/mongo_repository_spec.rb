@@ -5,15 +5,17 @@ require 'rdf/spec/repository'
 require 'rdf/mongo'
 
 describe RDF::Mongo::Repository do
-  before :each do
-    @logger = RDF::Spec.logger
-    @load_durable = lambda {RDF::Mongo::Repository.new uri: "mongodb://localhost:27017/rdf-mongo/specs", logger: @logger}
+  before :all do
+    logger = RDF::Spec.logger
+    logger.level = Logger::FATAL
+    @load_durable = lambda {RDF::Mongo::Repository.new uri: "mongodb://localhost:27017/rdf-mongo/specs", logger: logger}
     @repository = @load_durable.call
+  end
+  before :each do
     @repository.collection.drop
   end
  
-  after :each do |example|
-    #puts @logger.to_s if example.exception
+  after :each do
     @repository.collection.drop
   end
 
