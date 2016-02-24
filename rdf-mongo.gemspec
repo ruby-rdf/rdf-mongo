@@ -36,7 +36,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec',           '~> 3.4'
   gem.add_development_dependency 'rspec-its',       '~> 1.2'
   gem.add_development_dependency 'yard',            '~> 0.8'
-  gem.add_development_dependency 'bson_ext',        '~> 1.12' unless  defined?(:RUBY_ENGINE) && RUBY_ENGINE == "jruby"
 
   # Rubinius has it's own dependencies
   if RUBY_ENGINE == "rbx" && RUBY_VERSION >= "2.1.0"
