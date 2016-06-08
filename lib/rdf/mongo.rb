@@ -172,9 +172,24 @@ module RDF
       def supports?(feature)
         case feature.to_sym
           when :graph_name   then true
+          when :atomic_write then true
           when :validity     then @options.fetch(:with_validity, true)
           else false
         end
+      end
+
+      def apply_changeset(changeset)
+        ops = []
+
+        changeset.deletes.each do |d|
+          ops << { delete_one: { filter: statement_to_delete(d)} }
+        end
+
+        changeset.inserts.each do |i|
+          ops << { update_one: { filter: statement_to_insert(i), update: statement_to_insert(i), upsert: true} }
+        end
+
+        @collection.bulk_write(ops, ordered: true)
       end
 
       def insert_statement(statement)
