@@ -8,11 +8,11 @@ module RDF
     # Creates a BSON representation of the statement.
     # @return [Hash]
     def to_mongo
-      self.to_hash.inject({}) do |hash, (place_in_statement, entity)| 
-        hash.merge(RDF::Mongo::Conversion.to_mongo(entity, place_in_statement)) 
+      self.to_hash.inject({}) do |hash, (place_in_statement, entity)|
+        hash.merge(RDF::Mongo::Conversion.to_mongo(entity, place_in_statement))
       end
     end
-    
+
     ##
     # Create BSON for a statement representation. Note that if the statement has no graph name,
     # a value of `false` will be used to indicate the default context
@@ -27,7 +27,7 @@ module RDF
         graph_name: RDF::Mongo::Conversion.from_mongo(statement['c'], statement['ct'], statement['cl']))
     end
   end
-  
+
   module Mongo
     autoload :VERSION, "rdf/mongo/version"
 
@@ -68,7 +68,7 @@ module RDF
           v, k = value.to_s, :u
         end
         v = nil if v == ''
-        
+
         case place_in_statement
         when :subject
           t, k1, lt = :st, :s, :sl
@@ -114,7 +114,7 @@ module RDF
       # The collection used for storing quads
       # @return [Mongo::Collection]
       attr_reader :collection
-      
+
       ##
       # Initializes this repository instance.
       #
@@ -171,28 +171,36 @@ module RDF
       # @see RDF::Mutable#insert_statement
       def supports?(feature)
         case feature.to_sym
-          when :graph_name then true
+          when :graph_name   then true
+          when :atomic_write then true
           when :validity     then @options.fetch(:with_validity, true)
           else false
         end
       end
-      
+
+      def apply_changeset(changeset)
+        ops = []
+
+        changeset.deletes.each do |d|
+          ops << { delete_one: { filter: statement_to_delete(d)} }
+        end
+
+        changeset.inserts.each do |i|
+          ops << { update_one: { filter: statement_to_insert(i), update: statement_to_insert(i), upsert: true} }
+        end
+
+        @collection.bulk_write(ops, ordered: true)
+      end
+
       def insert_statement(statement)
-        raise ArgumentError, "Statement #{statement.inspect} is incomplete" if statement.incomplete?
-        st_mongo = statement.to_mongo
-        st_mongo[:ct] ||= :default # Indicate statement is in the default graph
-        #puts "insert statement: #{st_mongo.inspect}"
+        st_mongo = statement_to_insert(statement)
         @collection.update_one(st_mongo, st_mongo, upsert: true)
       end
 
       # @see RDF::Mutable#delete_statement
       def delete_statement(statement)
-        case statement.graph_name
-        when nil
-          @collection.delete_one(statement.to_mongo.merge('ct'=>:default))
-        else
-          @collection.delete_one(statement.to_mongo)
-        end
+        st_mongo = statement_to_delete(statement)
+        @collection.delete_one(st_mongo)
       end
 
       ##
@@ -261,12 +269,26 @@ module RDF
           block.call(RDF::Statement.from_mongo(document))
         end
       end
-    
+
       private
 
         def enumerator! # @private
           require 'enumerator' unless defined?(::Enumerable)
           @@enumerator_klass = defined?(::Enumerable::Enumerator) ? ::Enumerable::Enumerator : ::Enumerator
+        end
+
+        def statement_to_insert(statement)
+          raise ArgumentError, "Statement #{statement.inspect} is incomplete" if statement.incomplete?
+          st_mongo = statement.to_mongo
+          st_mongo[:ct] ||= :default # Indicate statement is in the default graph
+          #puts "insert statement: #{st_mongo.inspect}"
+          st_mongo
+        end
+
+        def statement_to_delete(statement)
+          st_mongo = statement.to_mongo
+          st_mongo[:ct] = :default if statement.graph_name.nil?
+          st_mongo
         end
     end
   end
