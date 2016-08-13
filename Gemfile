@@ -8,7 +8,6 @@ gem 'rdf-isomorphic', github: "ruby-rdf/rdf-isomorphic", branch: "develop"
 
 group :debug do
   gem "byebug", platforms: :mri
-  gem "wirble"
 end
 
 platforms :rbx do
