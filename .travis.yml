@@ -3,6 +3,8 @@ bundler_args: --without debug
 script: "bundle exec rspec spec"
 env:
   - CI=true
+services:
+  - mongodb
 rvm:
   - 2.2
   - 2.3
