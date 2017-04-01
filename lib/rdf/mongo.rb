@@ -8,7 +8,7 @@ module RDF
     # Creates a BSON representation of the statement.
     # @return [Hash]
     def to_mongo
-      self.to_hash.inject({}) do |hash, (place_in_statement, entity)|
+      self.to_h.inject({}) do |hash, (place_in_statement, entity)|
         hash.merge(RDF::Mongo::Conversion.to_mongo(entity, place_in_statement))
       end
     end
@@ -171,9 +171,10 @@ module RDF
       # @see RDF::Mutable#insert_statement
       def supports?(feature)
         case feature.to_sym
-          when :graph_name   then true
-          when :atomic_write then true
-          when :validity     then @options.fetch(:with_validity, true)
+          when :graph_name        then true
+          when :atomic_write      then true
+          when :validity          then @options.fetch(:with_validity, true)
+          when :literal_equality  then true
           else false
         end
       end
