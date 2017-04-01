@@ -8,7 +8,7 @@ module RDF
     # Creates a BSON representation of the statement.
     # @return [Hash]
     def to_mongo
-      self.to_hash.inject({}) do |hash, (place_in_statement, entity)|
+      self.to_h.inject({}) do |hash, (place_in_statement, entity)|
         hash.merge(RDF::Mongo::Conversion.to_mongo(entity, place_in_statement))
       end
     end
