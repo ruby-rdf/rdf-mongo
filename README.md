@@ -74,7 +74,7 @@ MIT License
 [W3C-ruby-rdf mailing list]:        http://lists.w3.org/Archives/Public/public-rdf-ruby/
 [Pius Uzamere]: http://pius.me
 [Gregg Kellogg]: http://greggkellogg.net/me
-[RDF.rb]:           http://rdf.rubyforge.org/
+[RDF.rb]:           http://ruby-rdf.github.com/
 [YARD]:             http://yardoc.org/
 [YARD-GS]:          http://rubydoc.info/docs/yard/file/docs/GettingStarted.md
 [PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
