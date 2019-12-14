@@ -165,7 +165,7 @@ module RDF
           #{key: {s: 1, o: "hashed"}}, # Muti-key hashed indexes not allowed
           #{key: {p: 1, o: "hashed"}}, # Muti-key hashed indexes not allowed
         ])
-        super(options, &block)
+        super(**options, &block)
       end
 
       # @see RDF::Mutable#insert_statement
