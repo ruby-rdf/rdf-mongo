@@ -25,15 +25,15 @@ Gem::Specification.new do |gem|
   gem.require_paths      = %w(lib)
   gem.test_files         = Dir.glob('spec/*.spec')
 
-  gem.required_ruby_version      = '>= 2.2.2'
+  gem.required_ruby_version      = '>= 2.4'
   gem.requirements               = []
-  gem.add_runtime_dependency     'rdf',             '>= 3.0'
-  gem.add_runtime_dependency     'mongo',           '~> 2.4'
+  gem.add_runtime_dependency     'rdf',             '>= 3.1'
+  gem.add_runtime_dependency     'mongo',           '~> 2.11'
 
-  gem.add_development_dependency 'rdf-spec',        '>= 3.0'
-  gem.add_development_dependency 'rspec',           '~> 3.7'
-  gem.add_development_dependency 'rspec-its',       '~> 1.2'
-  gem.add_development_dependency 'yard',            '~> 0.9.12'
+  gem.add_development_dependency 'rdf-spec',        '>= 3.1'
+  gem.add_development_dependency 'rspec',           '~> 3.9'
+  gem.add_development_dependency 'rspec-its',       '~> 1.3'
+  gem.add_development_dependency 'yard',            '~> 0.9.20'
 
   gem.post_install_message       = "Have fun! :)"
 end
