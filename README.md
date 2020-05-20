@@ -2,10 +2,8 @@
 
 This is an [RDF.rb][] storage adapter for MongoDB.
 
-See <http://blog.datagraph.org/2010/04/rdf-repository-howto> for an overview of the general approach of creating RDF::Repository adaptors.
-
-[![Gem Version](https://badge.fury.io/rb/rdf-mongo.png)](http://badge.fury.io/rb/rdf-mongo)
-[![Build Status](https://travis-ci.org/ruby-rdf/rdf-mongo.png?branch=master)](http://travis-ci.org/ruby-rdf/rdf-mongo)
+[![Gem Version](https://badge.fury.io/rb/rdf-mongo.png)](https://badge.fury.io/rb/rdf-mongo)
+[![Build Status](https://travis-ci.org/ruby-rdf/rdf-mongo.png?branch=master)](https://travis-ci.org/ruby-rdf/rdf-mongo)
 
 ## Versioning and backwards compatibility
 
@@ -44,12 +42,12 @@ one more more predicates having one or more types.
 Please post questions or feedback to the [W3C-ruby-rdf mailing list][].
 
 ### Authors
- * [Pius Uzamere][] | <http://github.com/pius> | <http://pius.me>
- * [Gregg Kellogg][] | <http://github.com/gkellogg> | <http://greggkellogg.net>
+ * [Pius Uzamere][] | <https://github.com/pius> | <https://pius.me>
+ * [Gregg Kellogg][] | <https://github.com/gkellogg> | <https://greggkellogg.net>
 
 ### Thank you
 
-* Ben Lavender (author of the adapter skeleton) | <blavender@gmail.com> | <http://github.com/bhuga> | <http://bhuga.net> | <http://blog.datagraph.org>
+* Ben Lavender (author of the adapter skeleton) | <blavender@gmail.com> | <https://github.com/bhuga> | <https://bhuga.net>
 
 ### Contributing
 
@@ -71,10 +69,10 @@ This repository uses [Git Flow](https://github.com/nvie/gitflow) to mange develo
 
 MIT License
 
-[W3C-ruby-rdf mailing list]:        http://lists.w3.org/Archives/Public/public-rdf-ruby/
-[Pius Uzamere]: http://pius.me
-[Gregg Kellogg]: http://greggkellogg.net/me
-[RDF.rb]:           http://ruby-rdf.github.com/
-[YARD]:             http://yardoc.org/
-[YARD-GS]:          http://rubydoc.info/docs/yard/file/docs/GettingStarted.md
-[PDD]:              http://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
+[W3C-ruby-rdf mailing list]:        https://lists.w3.org/Archives/Public/public-rdf-ruby/
+[Pius Uzamere]:     https://pius.me
+[Gregg Kellogg]:    https://greggkellogg.net/me
+[RDF.rb]:           https://ruby-rdf.github.com/
+[YARD]:             https://yardoc.org/
+[YARD-GS]:          https://rubydoc.info/docs/yard/file/docs/GettingStarted.md
+[PDD]:              https://lists.w3.org/Archives/Public/public-rdf-ruby/2010May/0013.html
