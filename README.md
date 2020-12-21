@@ -3,7 +3,8 @@
 This is an [RDF.rb][] storage adapter for MongoDB.
 
 [![Gem Version](https://badge.fury.io/rb/rdf-mongo.png)](https://badge.fury.io/rb/rdf-mongo)
-[![Build Status](https://travis-ci.org/ruby-rdf/rdf-mongo.png?branch=master)](https://travis-ci.org/ruby-rdf/rdf-mongo)
+[![Build Status](https://github.com/ruby-rdf/rdf-mongo/workflows/CI/badge.svg?branch=develop)](https://github.com/ruby-rdf/rdf-mongo/actions?query=workflow%3ACI)
+[![Gitter chat](https://badges.gitter.im/ruby-rdf/rdf.png)](https://gitter.im/ruby-rdf/rdf)
 
 ## Versioning and backwards compatibility
 
